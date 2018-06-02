@@ -19,13 +19,14 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 //	Texture img;
 	static final float WORLD_WIDTH = 480f;
 	static final float WORLD_HEIGHT = 800f;
+	static final int NUMBER_CARDS_IN_DECK=52;
 	float scaleX=1f;
 	float scaleY=1f;
 	float imagePosX=0f;
 	float imagePosY=0f;
 	private OrthographicCamera cam;
 	GestureDetector gestureDetector;
-	static final float stopForce=3.5f;
+	static final float stopForce=15f;
 	List<PlayingCard> deckOfCards=new ArrayList<PlayingCard>();
 	int lockCardPosition=-1;
 	private ShapeRenderer shapeRenderer;
@@ -43,7 +44,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		cam.update();
 		gestureDetector = new GestureDetector(this);
 		Gdx.input.setInputProcessor(gestureDetector);
-		for(int i=1;i<=4;i++){
+		for(int i=1;i<=NUMBER_CARDS_IN_DECK;i++){
 			deckOfCards.add(new PlayingCard(i));
 		}
 	}
@@ -57,14 +58,27 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		batch.setProjectionMatrix(cam.combined);
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		//batch.begin();
-		for(int i=(deckOfCards.size()-1);i>=0;i--){
+		batch.begin();
+		int cardInCenter=0;
+		int topCenter=0;
+		boolean isTopCenter=false;
+		while(!isTopCenter&&topCenter<52){
+			isTopCenter=deckOfCards.get(topCenter).isCardInStartPosition();
+			if(!isTopCenter){
+				topCenter++;
+			}
+		}
+		if(topCenter+3>=52){
+		    topCenter=51-3;
+        }
+		for(int i=topCenter+3;i>=0;i--){
 			//deckOfCards.get(i).update();
+            deckOfCards.get(i).update();
 			deckOfCards.get(i).draw(batch);
 
 		}
 		//batch.draw(img,imagePosX,imagePosY );
-		//batch.end();
+		batch.end();
 	}
 	
 	@Override

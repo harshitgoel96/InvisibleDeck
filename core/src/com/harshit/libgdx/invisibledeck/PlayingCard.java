@@ -13,8 +13,8 @@ public class PlayingCard {
     String cardValue;
     int intValue;
     boolean isSelection;
-    int velocityX=0;
-    int velocityY=0;
+    Vector2 velocityVector=new Vector2(0,0);
+    Vector2 defaultStart;
     Texture rectangle;
     PlayingCard(int value){
         this.intValue=value;
@@ -53,6 +53,8 @@ public class PlayingCard {
                     break;
 
                 case 3:
+                    this.suite=(value%13==0)?"Spades":"Diamonds";
+                    break;
                 case 4:
                     //value 39 to 52
                     this.suite="Diamonds";
@@ -69,9 +71,10 @@ public class PlayingCard {
             this.cardValue="back-side-1";
         }
         this.playingCardImage=new Texture(suite+"/"+cardValue+".png");
-        this.cardPosition=new Vector2();
-        this.cardPosition.x=(InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f);
-        this.cardPosition.y=(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f);
+        this.cardPosition=new Vector2((InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
+        this.defaultStart=new Vector2((InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
+//        this.cardPosition
+//        this.cardPosition.y=;
         createTexture(playingCardImage.getWidth(),playingCardImage.getHeight(),Color.BLACK);
     }
     void markSelection(){
@@ -79,36 +82,39 @@ public class PlayingCard {
 
     }
     void update(){
-        /*if(this.velocityX>0){
-            this.velocityX-=InvisibleDeck.stopForce;
-            if(this.velocityX<0){
-                this.velocityX=0;
-            }
-
-        }
-        if(this.velocityX<0){
-            this.velocityX+=InvisibleDeck.stopForce;
-            if(this.velocityX>0){
-                this.velocityX=0;
+        this.cardPosition.x+=this.velocityVector.x;
+        this.cardPosition.y+=this.velocityVector.y;
+        if(this.velocityVector.x>0){
+            this.velocityVector.x-=InvisibleDeck.stopForce;
+            if(this.velocityVector.x<0){
+                this.velocityVector.x=0;
             }
         }
-        if(this.velocityY>0){
-            this.velocityY-=InvisibleDeck.stopForce;
-            if(this.velocityY<0){
-                this.velocityY=0;
-            }
-
-        }
-        if(this.velocityY<0){
-            this.velocityY+=InvisibleDeck.stopForce;
-            if(this.velocityY>0){
-                this.velocityY=0;
+        if(this.velocityVector.y>0){
+            this.velocityVector.y-=InvisibleDeck.stopForce;
+            if(this.velocityVector.y<0){
+                this.velocityVector.y=0;
             }
         }
-        this.cardPosition.x+=this.velocityX;
-        this.cardPosition.y=this.velocityY;*/
+        if(this.velocityVector.x<0){
+            this.velocityVector.x+=InvisibleDeck.stopForce;
+            if(this.velocityVector.x>0){
+                this.velocityVector.x=0;
+            }
+        }
+        if(this.velocityVector.y<0){
+            this.velocityVector.y+=InvisibleDeck.stopForce;
+            if(this.velocityVector.y>0){
+                this.velocityVector.y=0;
+            }
+        }
     }
     boolean findTopCard(float x, float y, float deltaX, float deltaY){
+        if(!isCardOnScreen()
+                ){
+            System.out.println(this.cardValue+" of "+this.suite+" was not on screen");
+            return false;
+        }
         float finalY=InvisibleDeck.WORLD_HEIGHT-y;
         if(
                 x>this.cardPosition.x&&x<(this.cardPosition.x+this.playingCardImage.getWidth())
@@ -119,7 +125,10 @@ public class PlayingCard {
         return false;
     }
     boolean moveCard(float x, float y, float deltaX, float deltaY){
-
+        if(!isCardOnScreen()
+                ){
+            return false;
+        }
         System.out.println(this.cardValue+" of "+this.suite+"   card position  ("+this.cardPosition.x+":"+this.cardPosition.y+","
                 +(this.cardPosition.x+this.playingCardImage.getWidth())+":"+(this.cardPosition.y+this.playingCardImage.getHeight())+")");
         System.out.println(" touch point  "+x+":"+y);
@@ -127,17 +136,28 @@ public class PlayingCard {
 
 
             System.out.println();
-            this.cardPosition.x+=((int)deltaX);
-            this.cardPosition.y+=(-(int)deltaY);
+            this.velocityVector.x+=((int)deltaX);
+            this.velocityVector.y+=(-(int)deltaY);
             return true;
 
 
     }
-    void draw(SpriteBatch b){
-        b.begin();
-        b.draw(this.playingCardImage,this.cardPosition.x,this.cardPosition.y);
-        b.draw(this.rectangle,this.cardPosition.x,this.cardPosition.y);
-        b.end();
+    int draw(SpriteBatch b){
+//        b.begin();
+        if(
+                isCardOnScreen()
+                ){
+              b.draw(this.playingCardImage,this.cardPosition.x,this.cardPosition.y);
+        System.out.println(this.cardValue+" of "+this.suite+" was drawn card in center count ");}
+
+
+//        if(this.cardPosition.x==this.defaultStart.x && this.cardPosition.y==this.defaultStart.y){
+//            System.out.println(this.cardValue+" of "+this.suite+" is in center "+cardInCenter);
+//            cardInCenter=cardInCenter+1;
+//        }
+//        b.draw(this.rectangle,this.cardPosition.x,this.cardPosition.y);
+//        b.end();
+        return 0;
     }
     void dispose(){
         playingCardImage.dispose();
@@ -148,6 +168,16 @@ public class PlayingCard {
         pixmap.drawRectangle(0, 0, width, height);
         rectangle = new Texture(pixmap);
         pixmap.dispose();
+    }
+    boolean isCardOnScreen(){
+        return        this.cardPosition.x<InvisibleDeck.WORLD_WIDTH+1
+                && this.cardPosition.x>0-this.playingCardImage.getWidth()-1
+                && this.cardPosition.y<InvisibleDeck.WORLD_HEIGHT+1
+                &&  this.cardPosition.y>0-this.playingCardImage.getHeight()-1;
+
+    }
+    boolean isCardInStartPosition(){
+        return this.cardPosition.x==this.defaultStart.x && this.cardPosition.y==this.defaultStart.y;
     }
 
 }
