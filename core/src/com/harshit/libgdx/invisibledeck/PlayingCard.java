@@ -1,5 +1,7 @@
 package com.harshit.libgdx.invisibledeck;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -13,7 +15,7 @@ public class PlayingCard {
     boolean isSelection;
     int velocityX=0;
     int velocityY=0;
-
+    Texture rectangle;
     PlayingCard(int value){
         this.intValue=value;
         if(value<=52&&value>0)
@@ -70,7 +72,7 @@ public class PlayingCard {
         this.cardPosition=new Vector2();
         this.cardPosition.x=(InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f);
         this.cardPosition.y=(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f);
-
+        createTexture(playingCardImage.getWidth(),playingCardImage.getHeight(),Color.BLACK);
     }
     void markSelection(){
             isSelection=true;
@@ -107,9 +109,10 @@ public class PlayingCard {
         this.cardPosition.y=this.velocityY;*/
     }
     boolean findTopCard(float x, float y, float deltaX, float deltaY){
+        float finalY=InvisibleDeck.WORLD_HEIGHT-y;
         if(
-                x>this.cardPosition.x&&x<(this.cardPosition.x+this.playingCardImage.getHeight())
-                        &&y>this.cardPosition.y&&y<(this.cardPosition.y+this.playingCardImage.getWidth())
+                x>this.cardPosition.x&&x<(this.cardPosition.x+this.playingCardImage.getWidth())
+                        &&finalY>this.cardPosition.y&&finalY<(this.cardPosition.y+this.playingCardImage.getHeight())
                 )
         {return true;}
 
@@ -117,7 +120,8 @@ public class PlayingCard {
     }
     boolean moveCard(float x, float y, float deltaX, float deltaY){
 
-        System.out.println(" card position  "+this.cardPosition);
+        System.out.println(this.cardValue+" of "+this.suite+"   card position  ("+this.cardPosition.x+":"+this.cardPosition.y+","
+                +(this.cardPosition.x+this.playingCardImage.getWidth())+":"+(this.cardPosition.y+this.playingCardImage.getHeight())+")");
         System.out.println(" touch point  "+x+":"+y);
         System.out.println(" touch delta  "+deltaX+":"+deltaY);
 
@@ -130,10 +134,20 @@ public class PlayingCard {
 
     }
     void draw(SpriteBatch b){
+        b.begin();
         b.draw(this.playingCardImage,this.cardPosition.x,this.cardPosition.y);
+        b.draw(this.rectangle,this.cardPosition.x,this.cardPosition.y);
+        b.end();
     }
     void dispose(){
         playingCardImage.dispose();
+    }
+    private void createTexture(int width, int height, Color color) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(color);
+        pixmap.drawRectangle(0, 0, width, height);
+        rectangle = new Texture(pixmap);
+        pixmap.dispose();
     }
 
 }

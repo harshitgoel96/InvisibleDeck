@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
@@ -27,7 +28,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	static final float stopForce=3.5f;
 	List<PlayingCard> deckOfCards=new ArrayList<PlayingCard>();
 	int lockCardPosition=-1;
-
+	private ShapeRenderer shapeRenderer;
 
 	@Override
 	public void create () {
@@ -56,14 +57,14 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		batch.setProjectionMatrix(cam.combined);
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
+		//batch.begin();
 		for(int i=(deckOfCards.size()-1);i>=0;i--){
 			//deckOfCards.get(i).update();
 			deckOfCards.get(i).draw(batch);
 
 		}
 		//batch.draw(img,imagePosX,imagePosY );
-		batch.end();
+		//batch.end();
 	}
 	
 	@Override
@@ -83,7 +84,9 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	public boolean tap(float x, float y, int count, int button) {
 		System.out.println("====================");
 		System.out.println(x*scaleX);
-		System.out.println(y*scaleY);
+
+		float finalY=InvisibleDeck.WORLD_HEIGHT-(y*scaleY);
+		System.out.println(finalY);
 		System.out.println("====================");
 		return true;
 	}
