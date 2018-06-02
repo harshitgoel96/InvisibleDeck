@@ -8,11 +8,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class InvisibleDeck extends ApplicationAdapter implements GestureDetector.GestureListener {
 	SpriteBatch batch;
-	Texture img;
+//	Texture img;
 	static final float WORLD_WIDTH = 480f;
 	static final float WORLD_HEIGHT = 800f;
 	float scaleX=1f;
@@ -21,37 +24,54 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	float imagePosY=0f;
 	private OrthographicCamera cam;
 	GestureDetector gestureDetector;
+	static final float stopForce=3.5f;
+	List<PlayingCard> deckOfCards=new ArrayList<PlayingCard>();
+	int lockCardPosition=-1;
+
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("Clubs/Queen.png");
+
 		scaleX = WORLD_WIDTH/Gdx.graphics.getWidth();
 		scaleY = WORLD_HEIGHT/Gdx.graphics.getHeight();
-		imagePosX=(WORLD_WIDTH/2f)-(img.getWidth()/2f);
-		imagePosY=(WORLD_HEIGHT/2f)-(img.getHeight()/2f)	;
+//		imagePosX=(WORLD_WIDTH/2f)-(img.getWidth()/2f);
+//		imagePosY=(WORLD_HEIGHT/2f)-(img.getHeight()/2f)	;
 		cam = new OrthographicCamera(WORLD_WIDTH, WORLD_HEIGHT);
 		cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
 		cam.update();
 		gestureDetector = new GestureDetector(this);
 		Gdx.input.setInputProcessor(gestureDetector);
+		for(int i=1;i<=4;i++){
+			deckOfCards.add(new PlayingCard(i));
+		}
 	}
 
 	@Override
 	public void render () {
 
+//		for(PlayingCard p : deckOfCards){
+//			p.update();
+//		}
 		batch.setProjectionMatrix(cam.combined);
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
-		batch.draw(img,imagePosX,imagePosY );
+		for(int i=(deckOfCards.size()-1);i>=0;i--){
+			//deckOfCards.get(i).update();
+			deckOfCards.get(i).draw(batch);
+
+		}
+		//batch.draw(img,imagePosX,imagePosY );
 		batch.end();
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
+		for(PlayingCard p : deckOfCards){
+			p.dispose();
+		}
 	}
 
 	@Override
@@ -82,13 +102,29 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		//Vector3 touchPos = new Vector3(x,y,0);
 		//cam.unproject(touchPos);
-		System.out.println("====================");
-		System.out.println("deltaX  :: "+(deltaX*scaleX));
-		System.out.println("deltaY  :: "+(-deltaY*scaleY));
-		System.out.println("====================");
-		imagePosX+=(deltaX*scaleX);
-		imagePosY+=(-deltaY*scaleX);
+		float finalVelocityX=deltaX*scaleX;
+		float finalVelocityY=deltaY*scaleY;
+		float finalTouchX=x*scaleX;
+		float finalTouchY=y*scaleY;
 
+		boolean isCardMoved=false;
+		int i=0;
+		while(!isCardMoved &&i<deckOfCards.size() &&lockCardPosition==-1){
+			isCardMoved=deckOfCards.get(i).findTopCard(finalTouchX,finalTouchY,finalVelocityX,finalVelocityY);
+			if(!isCardMoved)
+			{
+				++i;
+			}
+			System.out.println("size:: "+deckOfCards.size());
+			System.out.println("i:: "+i);
+
+		}
+		if(isCardMoved){
+			lockCardPosition=i;
+		}
+		if(lockCardPosition>-1){
+			deckOfCards.get(lockCardPosition).moveCard(finalTouchX,finalTouchY,finalVelocityX,finalVelocityY);
+		}
 		return true;
 	}
 
@@ -97,6 +133,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		imagePosX+=(0);
 		imagePosY+=(0);
 		System.out.println("PAN STOP");
+		lockCardPosition=-1;
 		return true;
 	}
 
