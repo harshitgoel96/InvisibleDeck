@@ -11,6 +11,8 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	List<PlayingCard> deckOfCards=new ArrayList<PlayingCard>();
 	int lockCardPosition=-1;
 	private ShapeRenderer shapeRenderer;
+	boolean isCardSelectionMade=false;
 
 	@Override
 	public void create () {
@@ -96,13 +99,32 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
-		System.out.println("====================");
-		System.out.println(x*scaleX);
+		if(count==2) {
+			System.out.println("====================");
+			System.out.println(x * scaleX);
 
-		float finalY=InvisibleDeck.WORLD_HEIGHT-(y*scaleY);
-		System.out.println(finalY);
-		System.out.println("====================");
-		return true;
+			float finalTouchX = x * scaleX;
+			float finalTouchY = InvisibleDeck.WORLD_HEIGHT - (y * scaleY);
+			System.out.println(finalTouchY);
+			System.out.println("====================");
+			boolean isCardMoved = false;
+			int i = 0;
+			while (!isCardMoved && i < deckOfCards.size() && lockCardPosition == -1) {
+				isCardMoved = deckOfCards.get(i).findTopCard(finalTouchX, finalTouchY);
+				if (!isCardMoved) {
+					++i;
+				}
+				System.out.println("size:: " + deckOfCards.size());
+				System.out.println("i:: " + i);
+
+			}
+			if (deckOfCards.get(i).isSelection && !deckOfCards.get(i).isRevealed) {
+				deckOfCards.get(i).revealCard();
+			}
+
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -119,6 +141,15 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	public boolean pan(float x, float y, float deltaX, float deltaY) {
 		//Vector3 touchPos = new Vector3(x,y,0);
 		//cam.unproject(touchPos);
+		//static selection of 10 of C just to testing purpose, refactoring required once logic is decided
+		if(!isCardSelectionMade){
+
+
+			// fixed the selection to 10 of C for testing purpose, logic on selection yet to be decided.
+			deckOfCards.get(9).markSelection(10);
+			Collections.shuffle(deckOfCards);
+			isCardSelectionMade=true;
+		}
 		float finalVelocityX=deltaX*scaleX;
 		float finalVelocityY=deltaY*scaleY;
 		float finalTouchX=x*scaleX;
@@ -127,7 +158,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		boolean isCardMoved=false;
 		int i=0;
 		while(!isCardMoved &&i<deckOfCards.size() &&lockCardPosition==-1){
-			isCardMoved=deckOfCards.get(i).findTopCard(finalTouchX,finalTouchY,finalVelocityX,finalVelocityY);
+			isCardMoved=deckOfCards.get(i).findTopCard(finalTouchX,finalTouchY);
 			if(!isCardMoved)
 			{
 				++i;

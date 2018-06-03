@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PlayingCard {
     Texture playingCardImage;
+    Texture playingCardBack;
     Vector2 cardPosition;
     String suite;
     String cardValue;
@@ -16,6 +17,11 @@ public class PlayingCard {
     Vector2 velocityVector=new Vector2(0,0);
     Vector2 defaultStart;
     Texture rectangle;
+    boolean isRevealed=true;
+    boolean isCardMoved=false;
+    boolean isAnimationFalse;
+    int animationFrameCount=0;
+    private final int maxAnimationFrameCount=30;
     PlayingCard(int value){
         this.intValue=value;
         if(value<=52&&value>0)
@@ -77,8 +83,18 @@ public class PlayingCard {
 //        this.cardPosition.y=;
         createTexture(playingCardImage.getWidth(),playingCardImage.getHeight(),Color.BLACK);
     }
-    void markSelection(){
+    boolean markSelection(int selectionInt){
+
+        if(this.intValue==selectionInt)
+        {
             isSelection=true;
+            playingCardBack=new Texture("Backs/back-side-1.png");
+            isRevealed=false;
+            return true;
+        }
+        else{
+            return  false;
+        }
 
     }
     void update(){
@@ -109,7 +125,7 @@ public class PlayingCard {
             }
         }
     }
-    boolean findTopCard(float x, float y, float deltaX, float deltaY){
+    boolean findTopCard(float x, float y){
         if(!isCardOnScreen()
                 ){
             System.out.println(this.cardValue+" of "+this.suite+" was not on screen");
@@ -129,27 +145,38 @@ public class PlayingCard {
                 ){
             return false;
         }
-        System.out.println(this.cardValue+" of "+this.suite+"   card position  ("+this.cardPosition.x+":"+this.cardPosition.y+","
-                +(this.cardPosition.x+this.playingCardImage.getWidth())+":"+(this.cardPosition.y+this.playingCardImage.getHeight())+")");
-        System.out.println(" touch point  "+x+":"+y);
-        System.out.println(" touch delta  "+deltaX+":"+deltaY);
+        if(isRevealed) {
+            System.out.println(this.cardValue + " of " + this.suite + "   card position  (" + this.cardPosition.x + ":" + this.cardPosition.y + ","
+                    + (this.cardPosition.x + this.playingCardImage.getWidth()) + ":" + (this.cardPosition.y + this.playingCardImage.getHeight()) + ")");
+            System.out.println(" touch point  " + x + ":" + y);
+            System.out.println(" touch delta  " + deltaX + ":" + deltaY);
 
 
             System.out.println();
-            this.velocityVector.x+=((int)deltaX);
-            this.velocityVector.y+=(-(int)deltaY);
+            this.velocityVector.x += ((int) deltaX);
+            this.velocityVector.y += (-(int) deltaY);
+            isCardMoved=true;
             return true;
-
+        }
+        else{
+            return true;
+        }
 
     }
     int draw(SpriteBatch b){
 //        b.begin();
         if(
                 isCardOnScreen()
-                ){
-              b.draw(this.playingCardImage,this.cardPosition.x,this.cardPosition.y);
-        System.out.println(this.cardValue+" of "+this.suite+" was drawn card in center count ");}
-
+                ) {
+            if (isSelection && !isRevealed) {
+                b.draw(this.playingCardBack, this.cardPosition.x, this.cardPosition.y);
+                System.out.println(this.cardValue + " of " + this.suite + " was drawn card in center count ");
+            }
+            else{
+                b.draw(this.playingCardImage, this.cardPosition.x, this.cardPosition.y);
+                System.out.println(this.cardValue + " of " + this.suite + " back was drawn ");
+            }
+        }
 
 //        if(this.cardPosition.x==this.defaultStart.x && this.cardPosition.y==this.defaultStart.y){
 //            System.out.println(this.cardValue+" of "+this.suite+" is in center "+cardInCenter);
@@ -177,7 +204,20 @@ public class PlayingCard {
 
     }
     boolean isCardInStartPosition(){
-        return this.cardPosition.x==this.defaultStart.x && this.cardPosition.y==this.defaultStart.y;
+        return (this.cardPosition.x==this.defaultStart.x && this.cardPosition.y==this.defaultStart.y);
+    }
+    void revealCard(){
+        isRevealed=true;
+//        return true;
+    }
+    boolean isSelect(){
+        return this.isSelection;
+    }
+    void loadAnimationSequece(){
+
+    }
+    void animateCard(){
+
     }
 
 }
