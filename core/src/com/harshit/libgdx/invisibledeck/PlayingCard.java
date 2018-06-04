@@ -67,21 +67,21 @@ public class PlayingCard {
                     break;
             }
         }
-        if(value==0){
+        if(value<=0||value==53){
             this.cardValue="Joker";
             this.suite="Jokers";
 
         }
-        if(value==-1){
-            this.suite="Backs";
-            this.cardValue="back-side-1";
-        }
+//        if(value==-1){
+//            this.suite="Backs";
+//            this.cardValue="back-side-1";
+//        }
         this.playingCardImage=new Texture(suite+"/"+cardValue+".png");
         this.cardPosition=new Vector2((InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
         this.defaultStart=new Vector2((InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
 //        this.cardPosition
 //        this.cardPosition.y=;
-        createTexture(playingCardImage.getWidth(),playingCardImage.getHeight(),Color.BLACK);
+//        createTexture(playingCardImage.getWidth(),playingCardImage.getHeight(),Color.BLACK);
     }
     boolean markSelection(int selectionInt){
 
@@ -128,7 +128,7 @@ public class PlayingCard {
     boolean findTopCard(float x, float y){
         if(!isCardOnScreen()
                 ){
-            System.out.println(this.cardValue+" of "+this.suite+" was not on screen");
+            //System.out.println(this.cardValue+" of "+this.suite+" was not on screen");
             return false;
         }
         float finalY=InvisibleDeck.WORLD_HEIGHT-y;
@@ -146,13 +146,13 @@ public class PlayingCard {
             return false;
         }
         if(isRevealed) {
-            System.out.println(this.cardValue + " of " + this.suite + "   card position  (" + this.cardPosition.x + ":" + this.cardPosition.y + ","
-                    + (this.cardPosition.x + this.playingCardImage.getWidth()) + ":" + (this.cardPosition.y + this.playingCardImage.getHeight()) + ")");
-            System.out.println(" touch point  " + x + ":" + y);
-            System.out.println(" touch delta  " + deltaX + ":" + deltaY);
-
-
-            System.out.println();
+//            System.out.println(this.cardValue + " of " + this.suite + "   card position  (" + this.cardPosition.x + ":" + this.cardPosition.y + ","
+//                    + (this.cardPosition.x + this.playingCardImage.getWidth()) + ":" + (this.cardPosition.y + this.playingCardImage.getHeight()) + ")");
+//            System.out.println(" touch point  " + x + ":" + y);
+//            System.out.println(" touch delta  " + deltaX + ":" + deltaY);
+//
+//
+//            System.out.println();
             this.velocityVector.x += ((int) deltaX);
             this.velocityVector.y += (-(int) deltaY);
             isCardMoved=true;
@@ -170,11 +170,11 @@ public class PlayingCard {
                 ) {
             if (isSelection && !isRevealed) {
                 b.draw(this.playingCardBack, this.cardPosition.x, this.cardPosition.y);
-                System.out.println(this.cardValue + " of " + this.suite + " was drawn card in center count ");
+//                System.out.println(this.cardValue + " of " + this.suite + " was drawn card in center count ");
             }
             else{
                 b.draw(this.playingCardImage, this.cardPosition.x, this.cardPosition.y);
-                System.out.println(this.cardValue + " of " + this.suite + " back was drawn ");
+//                System.out.println(this.cardValue + " of " + this.suite + " back was drawn ");
             }
         }
 

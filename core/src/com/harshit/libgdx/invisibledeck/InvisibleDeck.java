@@ -2,7 +2,9 @@ package com.harshit.libgdx.invisibledeck;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -33,7 +35,12 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	int lockCardPosition=-1;
 	private ShapeRenderer shapeRenderer;
 	boolean isCardSelectionMade=false;
-
+	int swipeDirection=-1; //0-3  *13 to get suite
+	int selectionNumber=-1;//1-7 + i to get value
+	int swipeWhilePanning=-1;
+	int cardSelectedValue=-1;
+	boolean isSelectionNotified=false;
+	Texture aceBox;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -50,6 +57,10 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		for(int i=1;i<=NUMBER_CARDS_IN_DECK;i++){
 			deckOfCards.add(new PlayingCard(i));
 		}
+		Collections.shuffle(deckOfCards);
+		deckOfCards.add(0, new PlayingCard(0));
+		deckOfCards.add(0, new PlayingCard(0));
+		createTexture((int)Constants.value2.getWidth(),(int)Constants.value2.getHeight(),Color.BLACK);
 	}
 
 	@Override
@@ -80,6 +91,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			deckOfCards.get(i).draw(batch);
 
 		}
+//		batch.draw(aceBox,Constants.value2.x,Constants.value2.y);
 		//batch.draw(img,imagePosX,imagePosY );
 		batch.end();
 	}
@@ -100,13 +112,13 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
 		if(count==2) {
-			System.out.println("====================");
-			System.out.println(x * scaleX);
+//			System.out.println("====================");
+//			System.out.println(x * scaleX);
 
 			float finalTouchX = x * scaleX;
 			float finalTouchY = InvisibleDeck.WORLD_HEIGHT - (y * scaleY);
-			System.out.println(finalTouchY);
-			System.out.println("====================");
+//			System.out.println(finalTouchY);
+//			System.out.println("====================");
 			boolean isCardMoved = false;
 			int i = 0;
 			while (!isCardMoved && i < deckOfCards.size() && lockCardPosition == -1) {
@@ -114,8 +126,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 				if (!isCardMoved) {
 					++i;
 				}
-				System.out.println("size:: " + deckOfCards.size());
-				System.out.println("i:: " + i);
+//				System.out.println("size:: " + deckOfCards.size());
+//				System.out.println("i:: " + i);
 
 			}
 			if (deckOfCards.get(i).isSelection && !deckOfCards.get(i).isRevealed) {
@@ -142,14 +154,14 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		//Vector3 touchPos = new Vector3(x,y,0);
 		//cam.unproject(touchPos);
 		//static selection of 10 of C just to testing purpose, refactoring required once logic is decided
-		if(!isCardSelectionMade){
-
-
-			// fixed the selection to 10 of C for testing purpose, logic on selection yet to be decided.
-			deckOfCards.get(9).markSelection(10);
-			Collections.shuffle(deckOfCards);
-			isCardSelectionMade=true;
-		}
+//		if(!isCardSelectionMade){
+//
+//
+//			// fixed the selection to 10 of C for testing purpose, logic on selection yet to be decided.
+//			deckOfCards.get(9).markSelection(10);
+//			Collections.shuffle(deckOfCards);
+//			isCardSelectionMade=true;
+//		}
 		float finalVelocityX=deltaX*scaleX;
 		float finalVelocityY=deltaY*scaleY;
 		float finalTouchX=x*scaleX;
@@ -163,12 +175,17 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			{
 				++i;
 			}
-			System.out.println("size:: "+deckOfCards.size());
-			System.out.println("i:: "+i);
+//			System.out.println("size:: "+deckOfCards.size());
+//			System.out.println("i:: "+i);
 
 		}
 		if(isCardMoved){
 			lockCardPosition=i;
+			swipeWhilePanning=getDirectionOfSwipe(finalVelocityX,finalVelocityY);
+			if(i<2 && cardSelectedValue==-1){
+				selectionNumber=getSelectionValue(finalTouchX,WORLD_HEIGHT-finalTouchY);
+//				System.out.print("selection is :: "+selectionNumber);
+			}
 		}
 		if(lockCardPosition>-1){
 			deckOfCards.get(lockCardPosition).moveCard(finalTouchX,finalTouchY,finalVelocityX,finalVelocityY);
@@ -181,6 +198,25 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		imagePosX+=(0);
 		imagePosY+=(0);
 		System.out.println("PAN STOP");
+
+		swipeDirection=swipeWhilePanning;
+		System.out.print("final swipe direction :: "+swipeDirection + ": "+selectionNumber);
+//		System.out.print("final selection :: "+swipeDirection);
+
+		if(selectionNumber!=-1&&cardSelectedValue==-1){
+			if(lockCardPosition==2&&selectionNumber==7){
+				cardSelectedValue=0;
+			}
+			else{
+				cardSelectedValue=((13*swipeDirection)+(selectionNumber+lockCardPosition));
+				System.out.println("selection is :: "+cardSelectedValue);
+				isCardSelectionMade=true;
+				for(int i=2;i<deckOfCards.size()&&!isSelectionNotified;i++){
+					isSelectionNotified=deckOfCards.get(i).markSelection(cardSelectedValue);
+				}
+
+			}
+		}
 		lockCardPosition=-1;
 		return true;
 	}
@@ -198,5 +234,65 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	@Override
 	public void pinchStop() {
 
+	}
+
+	public int getDirectionOfSwipe(float deltaX, float deltaY){
+//		System.out.println("swipe  "+deltaX+":"+deltaY);
+		if(Math.abs(deltaX)>Math.abs(deltaY)){
+			if(deltaX>0){
+//				System.out.println("Swipe right");
+				return 1;
+//				onRight();
+			}else{
+//				System.out.println("Swipe left");
+				return 3;
+			}
+		}else{
+			if(deltaY>0){
+//				System.out.println("Swipe down");
+				return 2;
+			}else{
+//				System.out.println("Swipe up");
+				return 0;
+			}
+		}
+		//return -1;
+	}
+
+	public int getSelectionValue(float x,float y){
+		System.out.println("Coordinates for selection :: "+x+":"+y);
+		if(
+				x>Constants.value1.x&&x<(Constants.value1.x+Constants.value1.width)
+				&& y>Constants.value1.y && y<(Constants.value1.y+Constants.value1.height)
+				){
+			System.out.println("selected 1");
+			return 1;}
+		if(Constants.value2.contains(x,y)){
+			System.out.println("selected 2");
+			return 3;}
+		if(Constants.value3.contains(x,y)){
+			System.out.println("selected 3");
+		return 5;}
+		if(Constants.value4.contains(x,y)){
+			System.out.println("selected 4");
+		return 7;}
+		if(Constants.value5.contains(x,y)){
+			System.out.println("selected 5");
+		return 9;}
+		if(Constants.value6.contains(x,y)){
+			System.out.println("selected 6");
+			return 11;}
+		if(Constants.value7.contains(x,y)){
+			System.out.println("selected 7");
+		return 13;}
+
+		return -1;
+	}
+	private void createTexture(int width, int height, Color color) {
+		Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+		pixmap.setColor(color);
+		pixmap.drawRectangle(0, 0, width, height);
+		aceBox = new Texture(pixmap);
+		pixmap.dispose();
 	}
 }
