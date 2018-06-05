@@ -42,6 +42,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	boolean isSelectionNotified=false;
 	float lockedCardVelocityX=0;
 	float lockedCardVelocityY=0;
+
 	Texture aceBox;
 	@Override
 	public void create () {
@@ -217,6 +218,10 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 				isCardSelectionMade=true;
 				for(int i=2;i<deckOfCards.size()&&!isSelectionNotified;i++){
 					isSelectionNotified=deckOfCards.get(i).markSelection(cardSelectedValue);
+
+					if(isSelectionNotified){
+						System.out.print("swappintg between  "+i+" and ");
+					Collections.swap(deckOfCards,i,Constants.getRandomPosition());}
 				}
 
 			}

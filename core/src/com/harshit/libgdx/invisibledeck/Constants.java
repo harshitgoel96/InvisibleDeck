@@ -2,6 +2,8 @@ package com.harshit.libgdx.invisibledeck;
 
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.Random;
+
 public class Constants {
     public static final Rectangle value1=new Rectangle(35,494,71,134);
     public static final Rectangle value2=new Rectangle(144,540,70,70);
@@ -12,5 +14,18 @@ public class Constants {
     public static final Rectangle value7=new Rectangle(366,165,94,152);
 
     public static final int SELECTION_PADDING=30;
+
+
+    public static int getRandomPosition() {
+
+//        if (min >= max) {
+//            throw new IllegalArgumentException("max must be greater than min");
+//        }
+
+        Random r = new Random();
+        int val=r.nextInt((17 - 10) + 1) + 10;
+        System.out.println(val);
+        return val;
+    }
 
 }
