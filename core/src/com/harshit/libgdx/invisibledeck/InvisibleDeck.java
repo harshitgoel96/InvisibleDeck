@@ -30,7 +30,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	float imagePosY=0f;
 	private OrthographicCamera cam;
 	GestureDetector gestureDetector;
-	static final float stopForce=15f;
+	static final float stopForce=0.99f;
 	List<PlayingCard> deckOfCards=new ArrayList<PlayingCard>();
 	int lockCardPosition=-1;
 	private ShapeRenderer shapeRenderer;
@@ -40,6 +40,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	int swipeWhilePanning=-1;
 	int cardSelectedValue=-1;
 	boolean isSelectionNotified=false;
+	float lockedCardVelocityX=0;
+	float lockedCardVelocityY=0;
 	Texture aceBox;
 	@Override
 	public void create () {
@@ -60,7 +62,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		Collections.shuffle(deckOfCards);
 		deckOfCards.add(0, new PlayingCard(0));
 		deckOfCards.add(0, new PlayingCard(0));
-		createTexture((int)Constants.value2.getWidth(),(int)Constants.value2.getHeight(),Color.BLACK);
+		createTexture((int)Constants.value1.getWidth(),(int)Constants.value1.getHeight(),Color.BLACK);
 	}
 
 	@Override
@@ -91,7 +93,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			deckOfCards.get(i).draw(batch);
 
 		}
-//		batch.draw(aceBox,Constants.value2.x,Constants.value2.y);
+//		batch.draw(aceBox,Constants.value1.x,Constants.value1.y);
 		//batch.draw(img,imagePosX,imagePosY );
 		batch.end();
 	}
@@ -111,7 +113,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 
 	@Override
 	public boolean tap(float x, float y, int count, int button) {
-		if(count==2) {
+		if(count==1) {
 //			System.out.println("====================");
 //			System.out.println(x * scaleX);
 
@@ -182,6 +184,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		if(isCardMoved){
 			lockCardPosition=i;
 			swipeWhilePanning=getDirectionOfSwipe(finalVelocityX,finalVelocityY);
+			lockedCardVelocityX=finalVelocityX;
+			lockedCardVelocityY=finalVelocityY;
 			if(i<2 && cardSelectedValue==-1){
 				selectionNumber=getSelectionValue(finalTouchX,WORLD_HEIGHT-finalTouchY);
 //				System.out.print("selection is :: "+selectionNumber);
@@ -216,6 +220,9 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 				}
 
 			}
+		}
+		if(lockCardPosition!=-1){
+			deckOfCards.get(lockCardPosition).setCardVelocity(lockedCardVelocityX,lockedCardVelocityY);
 		}
 		lockCardPosition=-1;
 		return true;

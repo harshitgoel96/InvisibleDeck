@@ -100,30 +100,38 @@ public class PlayingCard {
     void update(){
         this.cardPosition.x+=this.velocityVector.x;
         this.cardPosition.y+=this.velocityVector.y;
-        if(this.velocityVector.x>0){
-            this.velocityVector.x-=InvisibleDeck.stopForce;
-            if(this.velocityVector.x<0){
+        this.velocityVector.x=(int) (this.velocityVector.x*InvisibleDeck.stopForce);
+        this.velocityVector.y=(int) (this.velocityVector.y*InvisibleDeck.stopForce);
+        if(this.isSelection){
+            if(checkPositionWithPadding()){
                 this.velocityVector.x=0;
-            }
-        }
-        if(this.velocityVector.y>0){
-            this.velocityVector.y-=InvisibleDeck.stopForce;
-            if(this.velocityVector.y<0){
                 this.velocityVector.y=0;
             }
         }
-        if(this.velocityVector.x<0){
-            this.velocityVector.x+=InvisibleDeck.stopForce;
-            if(this.velocityVector.x>0){
-                this.velocityVector.x=0;
-            }
-        }
-        if(this.velocityVector.y<0){
-            this.velocityVector.y+=InvisibleDeck.stopForce;
-            if(this.velocityVector.y>0){
-                this.velocityVector.y=0;
-            }
-        }
+//        if(this.velocityVector.x>0){
+//            this.velocityVector.x-=InvisibleDeck.stopForce;
+//            if(this.velocityVector.x<0){
+//                this.velocityVector.x=0;
+//            }
+//        }
+//        if(this.velocityVector.y>0){
+//            this.velocityVector.y-=InvisibleDeck.stopForce;
+//            if(this.velocityVector.y<0){
+//                this.velocityVector.y=0;
+//            }
+//        }
+//        if(this.velocityVector.x<0){
+//            this.velocityVector.x+=InvisibleDeck.stopForce;
+//            if(this.velocityVector.x>0){
+//                this.velocityVector.x=0;
+//            }
+//        }
+//        if(this.velocityVector.y<0){
+//            this.velocityVector.y+=InvisibleDeck.stopForce;
+//            if(this.velocityVector.y>0){
+//                this.velocityVector.y=0;
+//            }
+//        }
     }
     boolean findTopCard(float x, float y){
         if(!isCardOnScreen()
@@ -153,8 +161,8 @@ public class PlayingCard {
 //
 //
 //            System.out.println();
-            this.velocityVector.x += ((int) deltaX);
-            this.velocityVector.y += (-(int) deltaY);
+            this.cardPosition.x += ((int) deltaX);
+            this.cardPosition.y += (-(int) deltaY);
             isCardMoved=true;
             return true;
         }
@@ -162,6 +170,17 @@ public class PlayingCard {
             return true;
         }
 
+    }
+    boolean setCardVelocity(float deltaX, float deltaY){
+        if(this.isRevealed) {
+            this.velocityVector.x = (int) (deltaX * 3f);
+            this.velocityVector.y = -(int) (deltaY * 3f);
+        }
+//        if(isSelection&&checkPositionWithPadding()){
+//            this.velocityVector.x=0;
+//            this.velocityVector.y=0;
+//        }
+        return true;
     }
     int draw(SpriteBatch b){
 //        b.begin();
@@ -177,6 +196,7 @@ public class PlayingCard {
 //                System.out.println(this.cardValue + " of " + this.suite + " back was drawn ");
             }
         }
+
 
 //        if(this.cardPosition.x==this.defaultStart.x && this.cardPosition.y==this.defaultStart.y){
 //            System.out.println(this.cardValue+" of "+this.suite+" is in center "+cardInCenter);
@@ -218,6 +238,13 @@ public class PlayingCard {
     }
     void animateCard(){
 
+    }
+    boolean checkPositionWithPadding(){
+//        return        this.cardPosition.x-Constants.SELECTION_PADDING<InvisibleDeck.WORLD_WIDTH+1
+//                && this.cardPosition.x+Constants.SELECTION_PADDING>0-this.playingCardImage.getWidth()-1
+//                && this.cardPosition.y-Constants.SELECTION_PADDING<InvisibleDeck.WORLD_HEIGHT+1
+//                &&  this.cardPosition.y+Constants.SELECTION_PADDING>0-this.playingCardImage.getHeight()-1;
+        return false;
     }
 
 }
