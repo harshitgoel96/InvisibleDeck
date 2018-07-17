@@ -133,7 +133,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 //				System.out.println("i:: " + i);
 
 			}
-			if (deckOfCards.get(i).isSelection && !deckOfCards.get(i).isRevealed) {
+			if (i < deckOfCards.size()&&deckOfCards.get(i).isSelection && !deckOfCards.get(i).isRevealed) {
 				deckOfCards.get(i).revealCard();
 			}
 
