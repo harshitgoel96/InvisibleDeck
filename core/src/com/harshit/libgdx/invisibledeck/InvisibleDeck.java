@@ -46,6 +46,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	Sound swipeSound;
 	Sound turnSound;
 	Texture aceBox;
+	Long lockedSound;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -144,6 +145,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			if (i < deckOfCards.size()&&deckOfCards.get(i).isSelection && !deckOfCards.get(i).isRevealed) {
 				deckOfCards.get(i).revealCard();
 				turnSound.play(1.0f);
+
 			}
 
 			return true;
@@ -196,6 +198,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			swipeWhilePanning=getDirectionOfSwipe(finalVelocityX,finalVelocityY);
 			lockedCardVelocityX=finalVelocityX;
 			lockedCardVelocityY=finalVelocityY;
+			if(lockedSound==null)
+			{lockedSound=swipeSound.play(1.0f);}
 			if(i<2 && cardSelectedValue==-1){
 				selectionNumber=getSelectionValue(finalTouchX,WORLD_HEIGHT-finalTouchY);
 //				System.out.print("selection is :: "+selectionNumber);
@@ -204,7 +208,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		}
 		if(lockCardPosition>-1){
 			deckOfCards.get(lockCardPosition).moveCard(finalTouchX,finalTouchY,finalVelocityX,finalVelocityY);
-			swipeSound.play(1.0f);
+
 		}
 		return true;
 	}
@@ -227,6 +231,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 				cardSelectedValue=((13*swipeDirection)+(selectionNumber+lockCardPosition));
 				System.out.println("selection is :: "+cardSelectedValue);
 				isCardSelectionMade=true;
+				Gdx.input.vibrate(20);
 				for(int i=2;i<deckOfCards.size()&&!isSelectionNotified;i++){
 					isSelectionNotified=deckOfCards.get(i).markSelection(cardSelectedValue);
 
@@ -241,6 +246,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			deckOfCards.get(lockCardPosition).setCardVelocity(lockedCardVelocityX,lockedCardVelocityY);
 		}
 		lockCardPosition=-1;
+		lockedSound=null;
 		return true;
 	}
 
