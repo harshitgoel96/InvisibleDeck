@@ -2,6 +2,7 @@ package com.harshit.libgdx.invisibledeck;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -42,7 +43,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 	boolean isSelectionNotified=false;
 	float lockedCardVelocityX=0;
 	float lockedCardVelocityY=0;
-
+	Sound swipeSound;
+	Sound turnSound;
 	Texture aceBox;
 	@Override
 	public void create () {
@@ -64,6 +66,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		deckOfCards.add(0, new PlayingCard(0));
 		deckOfCards.add(0, new PlayingCard(0));
 		createTexture((int)Constants.value1.getWidth(),(int)Constants.value1.getHeight(),Color.BLACK);
+		swipeSound=Gdx.audio.newSound(Gdx.files.internal("sounds/swipe.ogg"));
+		turnSound=Gdx.audio.newSound(Gdx.files.internal("sounds/turn.ogg"));
 	}
 
 	@Override
@@ -105,6 +109,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 		for(PlayingCard p : deckOfCards){
 			p.dispose();
 		}
+		swipeSound.dispose();
+		turnSound.dispose();
 	}
 
 	@Override
@@ -128,6 +134,8 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 				isCardMoved = deckOfCards.get(i).findTopCard(finalTouchX, finalTouchY);
 				if (!isCardMoved) {
 					++i;
+				}else{
+
 				}
 //				System.out.println("size:: " + deckOfCards.size());
 //				System.out.println("i:: " + i);
@@ -135,6 +143,7 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 			}
 			if (i < deckOfCards.size()&&deckOfCards.get(i).isSelection && !deckOfCards.get(i).isRevealed) {
 				deckOfCards.get(i).revealCard();
+				turnSound.play(1.0f);
 			}
 
 			return true;
@@ -191,9 +200,11 @@ public class InvisibleDeck extends ApplicationAdapter implements GestureDetector
 				selectionNumber=getSelectionValue(finalTouchX,WORLD_HEIGHT-finalTouchY);
 //				System.out.print("selection is :: "+selectionNumber);
 			}
+
 		}
 		if(lockCardPosition>-1){
 			deckOfCards.get(lockCardPosition).moveCard(finalTouchX,finalTouchY,finalVelocityX,finalVelocityY);
+			swipeSound.play(1.0f);
 		}
 		return true;
 	}
