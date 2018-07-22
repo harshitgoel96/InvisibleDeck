@@ -6,6 +6,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
+import static com.harshit.libgdx.invisibledeck.Constants.WORLD_HEIGHT;
+import static com.harshit.libgdx.invisibledeck.Constants.WORLD_WIDTH;
+import static com.harshit.libgdx.invisibledeck.InvisibleDeckScreen.stopForce;
+
 public class PlayingCard {
     Texture playingCardImage;
     Texture playingCardBack;
@@ -77,8 +81,8 @@ public class PlayingCard {
 //            this.cardValue="back-side-1";
 //        }
         this.playingCardImage=new Texture(suite+"/"+cardValue+".png");
-        this.cardPosition=new Vector2((InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
-        this.defaultStart=new Vector2((InvisibleDeck.WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(InvisibleDeck.WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
+        this.cardPosition=new Vector2((WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
+        this.defaultStart=new Vector2((WORLD_WIDTH/2f)-(this.playingCardImage.getWidth()/2f),(WORLD_HEIGHT/2f)-(this.playingCardImage.getHeight()/2f));
 //        this.cardPosition
 //        this.cardPosition.y=;
 //        createTexture(playingCardImage.getWidth(),playingCardImage.getHeight(),Color.BLACK);
@@ -100,8 +104,8 @@ public class PlayingCard {
     void update(){
         this.cardPosition.x+=this.velocityVector.x;
         this.cardPosition.y+=this.velocityVector.y;
-        this.velocityVector.x=(int) (this.velocityVector.x*InvisibleDeck.stopForce);
-        this.velocityVector.y=(int) (this.velocityVector.y*InvisibleDeck.stopForce);
+        this.velocityVector.x=(int) (this.velocityVector.x*stopForce);
+        this.velocityVector.y=(int) (this.velocityVector.y*stopForce);
         if(this.isSelection){
             if(checkPositionWithPadding()){
                 this.velocityVector.x=0;
@@ -139,7 +143,7 @@ public class PlayingCard {
             //System.out.println(this.cardValue+" of "+this.suite+" was not on screen");
             return false;
         }
-        float finalY=InvisibleDeck.WORLD_HEIGHT-y;
+        float finalY=WORLD_HEIGHT-y;
         if(
                 x>this.cardPosition.x&&x<(this.cardPosition.x+this.playingCardImage.getWidth())
                         &&finalY>this.cardPosition.y&&finalY<(this.cardPosition.y+this.playingCardImage.getHeight())
@@ -217,9 +221,9 @@ public class PlayingCard {
         pixmap.dispose();
     }
     boolean isCardOnScreen(){
-        return        this.cardPosition.x<InvisibleDeck.WORLD_WIDTH+1
+        return        this.cardPosition.x<WORLD_WIDTH+1
                 && this.cardPosition.x>0-this.playingCardImage.getWidth()-1
-                && this.cardPosition.y<InvisibleDeck.WORLD_HEIGHT+1
+                && this.cardPosition.y<WORLD_HEIGHT+1
                 &&  this.cardPosition.y>0-this.playingCardImage.getHeight()-1;
 
     }

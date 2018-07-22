@@ -13,6 +13,12 @@ public class Constants {
     public static final Rectangle value6=new Rectangle(143,188,70,84);
     public static final Rectangle value7=new Rectangle(366,165,94,152);
 
+    //public static boolean soundEnable=false;
+    //public static int vibrationDuration=0;
+
+    public static final boolean soundDefault=true;
+    public static final int vibrationDefault=20;
+
     public static final int SELECTION_PADDING=30;
 
 
@@ -28,4 +34,11 @@ public class Constants {
         return val;
     }
 
+    public static final float WORLD_WIDTH = 480f;
+    public static final float WORLD_HEIGHT = 800f;
+    public static final int NUMBER_CARDS_IN_DECK=52;
+    public static float scaleX=1f;
+    public static float scaleY=1f;
+    public static float imagePosX=0f;
+    public static float imagePosY=0f;
 }
