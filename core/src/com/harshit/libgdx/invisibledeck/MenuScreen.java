@@ -43,7 +43,7 @@ public class MenuScreen  implements Screen, GestureDetector.GestureListener,Inpu
     GestureDetector gestureDetector;
     Preferences prefs;
    public MenuScreen(InvisibleDeck instanceOfGame){
-        prefs = Gdx.app.getPreferences("InvisibleDeck");
+       prefs = Gdx.app.getPreferences("InvisibleDeck");
        backgroundTexture=new Texture("GameMenu.png");
        this.gameInstance=instanceOfGame;
        this.font = new BitmapFont();
@@ -125,7 +125,7 @@ public class MenuScreen  implements Screen, GestureDetector.GestureListener,Inpu
            System.out.println("sound hit box");
            soundEnable=!soundEnable;
             prefs.putBoolean("sound",soundEnable);
-
+            prefs.flush();
             // you are touching your texture
         }
         if(vibrationHitbox.contains(finalTouchX,finalTouchY)){
@@ -183,6 +183,7 @@ public class MenuScreen  implements Screen, GestureDetector.GestureListener,Inpu
                 vibrationDuratoin=tempInt;
                 prefs.putInteger("vibration",vibrationDuratoin);
             }
+            prefs.flush();
         }
         catch (NumberFormatException e)
         {
